@@ -326,7 +326,7 @@ void tst_suggest(const tst_node *p,
     tst_suggest(p->lokid, c, nchr, a, n, max);
     if (p->key)
         tst_suggest(p->eqkid, c, nchr, a, n, max);
-    else if (*(((char *) p->eqkid) + nchr - 1) == c)
+    else if (*(((char *) p->eqkid) + nchr - 1) == c && *n != max)
         a[(*n)++] = (char *) p->eqkid;
     tst_suggest(p->hikid, c, nchr, a, n, max);
 }
