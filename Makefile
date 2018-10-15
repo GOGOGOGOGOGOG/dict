@@ -1,6 +1,6 @@
 TESTS = test_cpy test_ref
 
-TEST_DATA = s Tai
+TEST_DATA = s Calva
 
 CFLAGS = -O0 -Wall -Werror -g
 
@@ -43,10 +43,10 @@ test_%: test_%.o $(OBJS_LIB)
 
 test:  $(TESTS)
 	echo 3 | sudo tee /proc/sys/vm/drop_caches;
-	perf stat --repeat 20 \
+	perf stat --repeat 100 \
                 -e cache-misses,cache-references,instructions,cycles \
                 ./test_cpy --bench $(TEST_DATA)
-	perf stat --repeat 20 \
+	perf stat --repeat 100 \
                 -e cache-misses,cache-references,instructions,cycles \
 				./test_ref --bench $(TEST_DATA)
 				
@@ -58,10 +58,9 @@ test:  $(TESTS)
  output.txt: test calculate
 	./calculate
 
-plot: output.txt
+plot: output.txt bench_cpy.txt bench_ref.txt
 	gnuplot scripts/runtime.gp
 	eog runtime.png
-	bench_cpy.txt
 	gnuplot scripts/runtime3.gp
 	eog runtime3.png
 	gnuplot scripts/runtimept.gp
