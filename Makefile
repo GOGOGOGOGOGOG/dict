@@ -43,21 +43,38 @@ test_%: test_%.o $(OBJS_LIB)
 
 test:  $(TESTS)
 	echo 3 | sudo tee /proc/sys/vm/drop_caches;
-	perf stat --repeat 100 \
+	perf stat --repeat 20 \
                 -e cache-misses,cache-references,instructions,cycles \
                 ./test_cpy --bench $(TEST_DATA)
-	perf stat --repeat 100 \
+	perf stat --repeat 20 \
                 -e cache-misses,cache-references,instructions,cycles \
 				./test_ref --bench $(TEST_DATA)
+				
 
-bench: $(TESTS)
+ bench: $(TESTS)
 	@for test in $(TESTS); do\
 		./$$test --bench $(TEST_DATA); \
 	done
+ output.txt: test calculate
+	./calculate
 
+plot: output.txt
+	gnuplot scripts/runtime.gp
+	eog runtime.png
+	bench_cpy.txt
+	gnuplot scripts/runtime3.gp
+	eog runtime3.png
+	gnuplot scripts/runtimept.gp
+	eog runtime2.png 
+			
+
+calculate: calculate.c
+	$(CC) $(CFLAGS_common) $^ -o $@
+
+ 
 clean:
 	$(RM) $(TESTS) $(OBJS)
 	$(RM) $(deps)
-	rm -f  bench_cpy.txt bench_ref.txt ref.txt cpy.txt caculate
+	rm -f  bench_cpy.txt bench_ref.txt ref.txt cpy.txt output.txt caculate
 
 -include $(deps)
