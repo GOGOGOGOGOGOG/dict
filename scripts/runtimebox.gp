@@ -1,4 +1,12 @@
+reset
+set xlabel 'test'
+set ylabel 'time(microsec)'
+set title 'perfomance comparison(add)'
+set term png enhanced font 'Verdana,10'
+set output 'addruntime.png'
+set format x "%10.0f"
+set xtic 10
+set xtics rotate by 45 right
 
-stats "bench_ref.txt" using 2
- 
-stats "bench_cpy.txt" using 2
+plot [:300][:]'cpy.txt'  title 'cpy_ add',\
+'ref.txt'  title 'ref_ add'

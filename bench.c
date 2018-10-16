@@ -22,7 +22,7 @@ double tvgetf()
 
 int bench_test(const tst_node *root, char *out_file, const int max)
 {
-    char prefix[3] = "";
+    char prefix[4] = "";
     char word[WORDMAX] = "";
     char **sgl;
     FILE *fp = fopen(out_file, "w");

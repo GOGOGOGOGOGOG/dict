@@ -58,14 +58,15 @@ test:  $(TESTS)
  output.txt: test calculate
 	./calculate
 
-plot: output.txt bench_cpy.txt bench_ref.txt
+plot: output.txt bench_cpy.txt bench_ref.txt ref.txt cpy.txt
 	gnuplot scripts/runtime.gp
 	eog runtime.png
 	gnuplot scripts/runtime3.gp
 	eog runtime3.png
 	gnuplot scripts/runtimept.gp
 	eog runtime2.png 
-			
+	gnuplot scripts/runtimebox.gp
+	eog addruntime.png		
 
 calculate: calculate.c
 	$(CC) $(CFLAGS_common) $^ -o $@
