@@ -2,16 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+#include "bloom.h"
 #include "bench.c"
 #include "tst.h"
 /** constants insert, delete, max word(s) & stack nodes */
 enum { INS, DEL, WRDMAX = 256, STKMAX = 512, LMAX = 1024 };
 #define REF INS
 #define CPY DEL
-
+long poolsize = 2000000 * WRDMAX;
 #define BENCH_TEST_FILE "bench_cpy.txt"
-
+#define TableSize 5000000
 /* simple trim '\n' from end of buffer filled by fgets */
 static void rmcrlf(char *s)
 {
@@ -28,28 +28,35 @@ int main(int argc, char **argv)
     char *sgl[LMAX] = {NULL};
     tst_node *root = NULL, *res = NULL;
     int rtn = 0, idx = 0, sidx = 0;
-    double t1, t2;
-
     FILE *fp = fopen(IN_FILE, "r");
-
+    double t1, t2;
 
     if (!fp) { /* prompt, open, validate file for reading */
         fprintf(stderr, "error: file open failed '%s'.\n", argv[1]);
         return 1;
     }
-
     t1 = tvgetf();
-    while ((rtn = fscanf(fp, "%s", word)) != EOF) {
-        char *p = word;
-        if (!tst_ins_del(&root, &p, INS, CPY)) {
+
+    bloom_t bloom = bloom_create(TableSize);
+
+    /* memory pool */
+    char *pool = (char *) malloc(poolsize * sizeof(char));
+    char *Top = pool;
+    while ((rtn = fscanf(fp, "%s", Top)) != EOF) {
+        char *p = Top;
+        /* insert reference to each string */
+        if (!tst_ins_del(&root, &p, INS, REF)) { /* fail to insert */
             fprintf(stderr, "error: memory exhausted, tst_insert.\n");
             fclose(fp);
             return 1;
+        } else { /* update bloom filter */
+            bloom_add(bloom, Top);
         }
         idx++;
+        Top += (strlen(Top) + 1);
+        // break;
     }
     t2 = tvgetf();
-
     fclose(fp);
     printf("ternary_tree, loaded %d words in %.6f sec\n", idx, t2 - t1);
 
@@ -168,7 +175,7 @@ int main(int argc, char **argv)
             break;
         quit:
         case 'q':
-            tst_free_all(root);
+            tst_free(root);
             return 0;
             break;
         default:

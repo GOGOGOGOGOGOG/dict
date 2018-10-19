@@ -1,6 +1,6 @@
 TESTS = test_cpy test_ref
 
-TEST_DATA = s Calva
+TEST_DATA = s Tai
 
 CFLAGS = -O0 -Wall -Werror -g
 
@@ -58,7 +58,7 @@ test:  $(TESTS)
  output.txt: test calculate
 	./calculate
 
-plot: output.txt bench_cpy.txt bench_ref.txt ref.txt cpy.txt
+plot: output.txt bench_cpy.txt bench_ref.txt ref.txt #cpy.txt
 	gnuplot scripts/runtime.gp
 	eog runtime.png
 	gnuplot scripts/runtime3.gp
@@ -75,6 +75,6 @@ calculate: calculate.c
 clean:
 	$(RM) $(TESTS) $(OBJS)
 	$(RM) $(deps)
-	rm -f  bench_cpy.txt bench_ref.txt ref.txt cpy.txt output.txt caculate
+	rm -f  ref.txt cpy.txt output.txt caculate
 
 -include $(deps)
